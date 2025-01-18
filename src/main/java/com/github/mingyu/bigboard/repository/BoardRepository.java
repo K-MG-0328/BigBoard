@@ -1,6 +1,5 @@
 package com.github.mingyu.bigboard.repository;
 
-import com.github.mingyu.bigboard.dto.BoardDetailDTO;
 import com.github.mingyu.bigboard.entitiy.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
