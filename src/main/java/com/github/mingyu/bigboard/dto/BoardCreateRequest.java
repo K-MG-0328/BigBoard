@@ -1,23 +1,19 @@
 package com.github.mingyu.bigboard.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
-public class BoardDetailDTO {
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class BoardCreateRequest {
+
     private Long boardId;
-
     private String title;
-
     private String content;
-
     private String authorId;
-
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    private Integer viewCount;
-
-    private Double rating;
 }

@@ -1,6 +1,8 @@
 package com.github.mingyu.bigboard.controller;
 
-import com.github.mingyu.bigboard.entitiy.Board;
+import com.github.mingyu.bigboard.dto.BoardCreateRequest;
+import com.github.mingyu.bigboard.dto.BoardDetailResponse;
+import com.github.mingyu.bigboard.entity.Board;
 import com.github.mingyu.bigboard.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,26 +17,31 @@ public class BoardController {
 
     private final BoardService boardService;
 
+    //게시글 생성
     @PostMapping
-    public ResponseEntity<Board> createBoard(@RequestBody Board board) {
+    public ResponseEntity<Board> createBoard(@RequestBody BoardCreateRequest board) {
         return ResponseEntity.ok(boardService.createBoard(board));
     }
 
+    //게시글 목록 조회
     @GetMapping
     public ResponseEntity<Page<Board>> getBoards(Pageable pageable) {
         return ResponseEntity.ok(boardService.getAllBoards(pageable));
     }
 
+    //게시글 상세 조회
     @GetMapping("/{boardId}")
-    public ResponseEntity<Board> getBoard(@PathVariable Long boardId) {
+    public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.getBoardById(boardId));
     }
 
+    //게시글 수정
     @PutMapping("/{boardId}")
-    public ResponseEntity<Board> updateBoard(@PathVariable Long boardId, @RequestBody Board board) {
-        return ResponseEntity.ok(boardService.updateBoard(board.getBoardId(), board));
+    public ResponseEntity<Board> updateBoard(@RequestBody Board board) {
+        return ResponseEntity.ok(boardService.updateBoard(board));
     }
 
+    //게시글 삭제
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deletBoard(@PathVariable Long boardId) {
         boardService.deleteBoard(boardId);
