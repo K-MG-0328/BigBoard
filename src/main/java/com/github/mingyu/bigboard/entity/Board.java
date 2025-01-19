@@ -1,7 +1,6 @@
 package com.github.mingyu.bigboard.entity;
 
-import com.github.mingyu.bigboard.dto.BoardCreateRequest;
-import com.github.mingyu.bigboard.dto.BoardDetailResponse;
+import com.github.mingyu.bigboard.dto.BoardDetailRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -46,13 +45,13 @@ public class Board {
         return ratingCount == 0 ? 0 : (double) totalScore / ratingCount;
     }
 
-    public static Board toBoard(BoardCreateRequest boardCreateRequest) {
+    public static Board toBoard(BoardDetailRequest boardDetailRequest) {
         return Board.builder()
-                .boardId(boardCreateRequest.getBoardId())
-                .title(boardCreateRequest.getTitle())
-                .content(boardCreateRequest.getContent())
-                .authorId(boardCreateRequest.getAuthorId())
-                .createdAt(boardCreateRequest.getCreatedAt())
+                .boardId(boardDetailRequest.getBoardId())
+                .title(boardDetailRequest.getTitle())
+                .content(boardDetailRequest.getContent())
+                .authorId(boardDetailRequest.getAuthorId())
+                .createdAt(boardDetailRequest.getCreatedAt())
                 .build();
     }
 

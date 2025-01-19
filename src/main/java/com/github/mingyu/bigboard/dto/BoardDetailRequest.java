@@ -9,11 +9,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class BoardCreateRequest {
+public class BoardDetailRequest {
 
     private Long boardId;
     private String title;
     private String content;
     private String authorId;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 }

@@ -10,27 +10,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class BoardDetailResponse {
+public class BoardResponse {
 
     private Long boardId;
     private String title;
-    private String content;
     private String authorId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer viewCount;
-    private Double rating;
 
-    public static BoardDetailResponse toBoardDetailResponse(Board board) {
-        return BoardDetailResponse.builder()
+    public static BoardResponse toBoardResponse(Board board) {
+        return BoardResponse.builder()
                 .boardId(board.getBoardId())
                 .title(board.getTitle())
-                .content(board.getContent())
                 .authorId(board.getAuthorId())
                 .createdAt(board.getCreatedAt())
                 .updatedAt(board.getUpdatedAt())
                 .viewCount(board.getViewCount())
-                .rating(board.getAverageScore())
                 .build();
     }
 

@@ -1,8 +1,9 @@
 package com.github.mingyu.bigboard.controller;
 
-import com.github.mingyu.bigboard.dto.BoardCreateRequest;
+import com.github.mingyu.bigboard.dto.BoardDetailRequest;
 import com.github.mingyu.bigboard.dto.BoardDetailResponse;
-import com.github.mingyu.bigboard.entity.Board;
+import com.github.mingyu.bigboard.dto.BoardResponse;
+import com.github.mingyu.bigboard.dto.BoardScore;
 import com.github.mingyu.bigboard.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,13 +20,13 @@ public class BoardController {
 
     //게시글 생성
     @PostMapping
-    public ResponseEntity<Board> createBoard(@RequestBody BoardCreateRequest board) {
+    public ResponseEntity<BoardDetailResponse> createBoard(@RequestBody BoardDetailRequest board) {
         return ResponseEntity.ok(boardService.createBoard(board));
     }
 
     //게시글 목록 조회
     @GetMapping
-    public ResponseEntity<Page<Board>> getBoards(Pageable pageable) {
+    public ResponseEntity<Page<BoardResponse>> getBoards(Pageable pageable) {
         return ResponseEntity.ok(boardService.getAllBoards(pageable));
     }
 
@@ -37,7 +38,7 @@ public class BoardController {
 
     //게시글 수정
     @PutMapping("/{boardId}")
-    public ResponseEntity<Board> updateBoard(@RequestBody Board board) {
+    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest board) {
         return ResponseEntity.ok(boardService.updateBoard(board));
     }
 
@@ -46,5 +47,11 @@ public class BoardController {
     public ResponseEntity<Void> deletBoard(@PathVariable Long boardId) {
         boardService.deleteBoard(boardId);
         return ResponseEntity.noContent().build();
+    }
+
+    //평가
+    @PutMapping("/evaluation")
+    public ResponseEntity<Double> updateBoardRating(@RequestBody BoardScore board) {
+        return ResponseEntity.ok(boardService.updateBoardRating(board));
     }
 }
