@@ -22,7 +22,8 @@ public class BoardService {
 
     //게시글 생성
     public BoardDetailResponse createBoard(BoardDetailRequest boardDetailRequest) {
-        Board board = boardRepository.save(Board.toBoard(boardDetailRequest));
+        Board board = Board.toBoard(boardDetailRequest);
+        boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }
 
