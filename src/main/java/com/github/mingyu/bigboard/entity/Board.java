@@ -28,18 +28,18 @@ public class Board {
     @Column(nullable = false)
     private String authorId;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @Column
-    private Integer viewCount=0;
+    @Column(nullable = false)
+    private int viewCount=0;
 
     @Column(nullable = false)
-    private Integer totalScore = 0;
+    private int totalScore = 0;
 
     @Column(nullable = false)
-    private Integer ratingCount = 0;
+    private int ratingCount = 0;
 
     public double getAverageScore() {
         return ratingCount == 0 ? 0 : (double) totalScore / ratingCount;
