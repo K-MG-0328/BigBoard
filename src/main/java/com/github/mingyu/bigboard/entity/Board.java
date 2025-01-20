@@ -32,17 +32,33 @@ public class Board {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    private int viewCount=0;
+    @Column
+    private int viewCount = 0;
 
-    @Column(nullable = false)
-    private int totalScore = 0;
+    @Column
+    private double totalScore = 0;
 
-    @Column(nullable = false)
+    @Column
     private int ratingCount = 0;
 
     public double getAverageScore() {
         return ratingCount == 0 ? 0 : (double) totalScore / ratingCount;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
+    }
+
+    public void setTotalScore(double totalScore) {
+        this.totalScore = totalScore;
     }
 
     public static Board toBoard(BoardDetailRequest boardDetailRequest) {
@@ -52,6 +68,7 @@ public class Board {
                 .content(boardDetailRequest.getContent())
                 .authorId(boardDetailRequest.getAuthorId())
                 .createdAt(boardDetailRequest.getCreatedAt())
+                .updatedAt(boardDetailRequest.getUpdatedAt())
                 .build();
     }
 

@@ -2,9 +2,9 @@ package com.github.mingyu.bigboard.service;
 
 import com.github.mingyu.bigboard.dto.BoardDetailRequest;
 import com.github.mingyu.bigboard.dto.BoardDetailResponse;
-import com.github.mingyu.bigboard.dto.BoardResponse;
 import com.github.mingyu.bigboard.dto.BoardScore;
 import com.github.mingyu.bigboard.entity.Board;
+import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.repository.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class BoardService {
     }
 
     //게시글 목록 조회
-    public Page<BoardResponse> getAllBoards(Pageable pageable) {
+    public Page<BoardProjection> getAllBoards(Pageable pageable) {
         return boardRepository.findBoardAll(pageable);
     }
 
@@ -42,7 +42,10 @@ public class BoardService {
 
     //게시글 수정
     public BoardDetailResponse updateBoard(BoardDetailRequest updateBoard){
-        Board board = boardRepository.save(Board.toBoard(updateBoard));
+        Board board = boardRepository.findById(updateBoard.getBoardId()).orElse(null);
+        board.setContent(updateBoard.getContent());
+        board.setUpdatedAt(updateBoard.getUpdatedAt());
+        boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }
 
@@ -52,9 +55,11 @@ public class BoardService {
     }
 
     //평점 추가
-    public double updateBoardRating(BoardScore board){
-        boardRepository.evaluationBoard(board);
-        BoardScore boardScore = boardRepository.getTotalScore(board.getBoardId());
-        return boardScore.getAverageScore();
+    public double updateBoardRating(BoardScore boardScore){
+        Board board = boardRepository.findById(boardScore.getBoardId()).orElse(null);
+        board.setRatingCount(board.getRatingCount()+1);
+        board.setTotalScore(board.getTotalScore() + boardScore.getScore());
+        boardRepository.save(board);
+        return board.getAverageScore();
     }
 }

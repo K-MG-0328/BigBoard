@@ -2,8 +2,8 @@ package com.github.mingyu.bigboard.controller;
 
 import com.github.mingyu.bigboard.dto.BoardDetailRequest;
 import com.github.mingyu.bigboard.dto.BoardDetailResponse;
-import com.github.mingyu.bigboard.dto.BoardResponse;
 import com.github.mingyu.bigboard.dto.BoardScore;
+import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ public class BoardController {
 
     //게시글 목록 조회
     @GetMapping
-    public ResponseEntity<Page<BoardResponse>> getBoards(Pageable pageable) {
+    public ResponseEntity<Page<BoardProjection>> getBoards(Pageable pageable) {
         return ResponseEntity.ok(boardService.getAllBoards(pageable));
     }
 
@@ -51,7 +51,7 @@ public class BoardController {
 
     //평가
     @PutMapping("/evaluation")
-    public ResponseEntity<Double> updateBoardRating(@RequestBody BoardScore board) {
-        return ResponseEntity.ok(boardService.updateBoardRating(board));
+    public ResponseEntity<Double> updateBoardRating(@RequestBody BoardScore boardScore) {
+        return ResponseEntity.ok(boardService.updateBoardRating(boardScore));
     }
 }
