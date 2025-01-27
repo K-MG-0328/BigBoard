@@ -8,6 +8,7 @@ import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.repository.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,11 @@ public class BoardService {
     }
 
     //게시글 목록 조회
+    @Cacheable(
+            cacheNames = "getBoards",
+            key = "'boards:page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize",
+            cacheManager = "cacheManager"
+    )
     public Page<BoardProjection> getAllBoards(Pageable pageable) {
         return boardRepository.findBoardAll(pageable);
     }
