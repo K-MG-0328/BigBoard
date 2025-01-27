@@ -3,6 +3,8 @@ package com.github.mingyu.bigboard.entity;
 import com.github.mingyu.bigboard.dto.BoardDetailRequest;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -28,8 +30,11 @@ public class Board {
     @Column(nullable = false)
     private String authorId;
 
-    @Column
+    @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     @Column
@@ -67,8 +72,8 @@ public class Board {
                 .title(boardDetailRequest.getTitle())
                 .content(boardDetailRequest.getContent())
                 .authorId(boardDetailRequest.getAuthorId())
-                .createdAt(boardDetailRequest.getCreatedAt())
-                .updatedAt(boardDetailRequest.getUpdatedAt())
+                .createdAt(boardDetailRequest.getCreatedAt() != null ? boardDetailRequest.getCreatedAt() : LocalDateTime.now())
+                .updatedAt(boardDetailRequest.getUpdatedAt() != null ? boardDetailRequest.getUpdatedAt() : LocalDateTime.now())
                 .build();
     }
 
