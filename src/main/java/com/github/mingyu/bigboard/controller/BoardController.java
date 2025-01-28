@@ -2,6 +2,7 @@ package com.github.mingyu.bigboard.controller;
 
 import com.github.mingyu.bigboard.dto.BoardDetailRequest;
 import com.github.mingyu.bigboard.dto.BoardDetailResponse;
+import com.github.mingyu.bigboard.dto.BoardResponse;
 import com.github.mingyu.bigboard.dto.BoardScore;
 import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.service.BoardService;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/board")
@@ -24,13 +27,27 @@ public class BoardController {
         return ResponseEntity.ok(boardService.createBoard(board));
     }
 
-    //게시글 목록 조회
-    @GetMapping
+    //게시글 목록 조회 Redis 적용 전
+    @GetMapping("/before")
     public ResponseEntity<Page<BoardProjection>> getBoards(Pageable pageable) {
-        return ResponseEntity.ok(boardService.getAllBoards(pageable));
+        return ResponseEntity.ok(boardService.getAllBoardsBefore(pageable));
     }
 
-    //게시글 상세 조회
+    //게시글 목록 조회 Redis 적용 후
+    @GetMapping()
+    public List<BoardResponse> getBoards(
+            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size
+    ) {
+        return boardService.getBoards(page, size);
+    }
+
+    //게시글 상세 조회 Redis 적용 전
+    @GetMapping("/before/{boardId}")
+    public ResponseEntity<BoardDetailResponse> getBoardBefore(@PathVariable Long boardId) {
+        return ResponseEntity.ok(boardService.getBoardByIdBefore(boardId));
+    }
+
+    //게시글 상세 조회 Redis 적용 후
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.getBoardById(boardId));

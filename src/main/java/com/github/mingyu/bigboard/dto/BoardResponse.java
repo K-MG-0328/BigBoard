@@ -1,11 +1,19 @@
 package com.github.mingyu.bigboard.dto;
 
-import com.github.mingyu.bigboard.entity.Board;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.github.mingyu.bigboard.projection.BoardProjection;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Deprecated
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -15,7 +23,15 @@ public class BoardResponse {
     private Long boardId;
     private String title;
     private String authorId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
     private Integer viewCount;
 
@@ -29,14 +45,14 @@ public class BoardResponse {
         this.viewCount = viewCount;
     }
 
-    public static BoardResponse toBoardResponse(Board board) {
+    public static BoardResponse toBoardResponse(BoardProjection boardProjection) {
         return BoardResponse.builder()
-                .boardId(board.getBoardId())
-                .title(board.getTitle())
-                .authorId(board.getAuthorId())
-                .createdAt(board.getCreatedAt())
-                .updatedAt(board.getUpdatedAt())
-                .viewCount(board.getViewCount())
+                .boardId(boardProjection.getBoardId())
+                .title(boardProjection.getTitle())
+                .authorId(boardProjection.getAuthorId())
+                .createdAt(boardProjection.getCreatedAt())
+                .updatedAt(boardProjection.getUpdatedAt())
+                .viewCount(boardProjection.getViewCount())
                 .build();
     }
 

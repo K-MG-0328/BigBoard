@@ -1,6 +1,5 @@
 package com.github.mingyu.bigboard.repository;
 
-import com.github.mingyu.bigboard.dto.BoardResponse;
 import com.github.mingyu.bigboard.dto.BoardScore;
 import com.github.mingyu.bigboard.entity.Board;
 import com.github.mingyu.bigboard.projection.BoardProjection;
@@ -22,6 +21,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "from Board b")
     Page<BoardProjection> findBoardAll(Pageable pageable);
 
+    Page<Board> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
     //조회수 증가
     @Modifying
     @Query("update Board set viewCount = viewCount + 1 where boardId = :boardId")
@@ -35,4 +36,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     //평점 조회
     @Query("select totalScore, ratingCount from Board where boardId = :boardId")
     BoardScore getTotalScore(@Param("boardId") Long boardId);
+
+    @Modifying
+    @Query("UPDATE Board b SET b.viewCount = :viewCount WHERE b.boardId = :boardId")
+    void updateViewCount(@Param("boardId") Long boardId, @Param("viewCount") int viewCount);
 }
