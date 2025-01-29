@@ -11,11 +11,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BoardScore {
     private Long boardId;
-    private Double score= 0.0;
-    private Integer totalScore = 0;
-    private Integer ratingCount = 0;
+    private double score= 0.0;
+    private double totalScore = 0.0;
+    private int ratingCount = 0;
 
     public double getAverageScore() {
-        return ratingCount == 0 ? 0 : (double) totalScore / ratingCount;
+        return ratingCount == 0 ? 0 : totalScore / ratingCount;
     }
 }

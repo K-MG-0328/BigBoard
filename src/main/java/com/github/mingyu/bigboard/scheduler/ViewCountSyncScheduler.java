@@ -1,10 +1,11 @@
-package com.github.mingyu.bigboard.service;
+package com.github.mingyu.bigboard.scheduler;
 
+import com.github.mingyu.bigboard.util.RedisKeyHelper;
+import com.github.mingyu.bigboard.service.RedisViewCountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -15,9 +16,7 @@ public class ViewCountSyncScheduler {
 
     private final RedisViewCountService redisViewCountService;
 
-    //@Scheduled(fixedRate = 60000) // 60초마다 동기화
-    @Transactional
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 60000) // 60초마다 동기화
     public void syncViewCounts() {
         log.info("Starting view count sync...");
         Set<String> keys = redisViewCountService.getAllKeys("board:*:viewCount");

@@ -1,4 +1,4 @@
-package com.github.mingyu.bigboard.service;
+package com.github.mingyu.bigboard.util;
 
 public class RedisKeyHelper {
 
@@ -10,4 +10,5 @@ public class RedisKeyHelper {
         }
         throw new IllegalArgumentException("Invalid Redis key format: " + key);
     }
+
 }

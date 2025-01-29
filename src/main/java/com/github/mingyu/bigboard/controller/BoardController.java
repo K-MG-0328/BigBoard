@@ -2,7 +2,6 @@ package com.github.mingyu.bigboard.controller;
 
 import com.github.mingyu.bigboard.dto.BoardDetailRequest;
 import com.github.mingyu.bigboard.dto.BoardDetailResponse;
-import com.github.mingyu.bigboard.dto.BoardResponse;
 import com.github.mingyu.bigboard.dto.BoardScore;
 import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.service.BoardService;
@@ -12,10 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Deprecated
 @RestController
-@RequestMapping("/board")
+@RequestMapping("/before/board")
 @RequiredArgsConstructor
 public class BoardController {
 
@@ -28,29 +26,15 @@ public class BoardController {
     }
 
     //게시글 목록 조회 Redis 적용 전
-    @GetMapping("/before")
+    @GetMapping()
     public ResponseEntity<Page<BoardProjection>> getBoards(Pageable pageable) {
         return ResponseEntity.ok(boardService.getAllBoardsBefore(pageable));
     }
 
-    //게시글 목록 조회 Redis 적용 후
-    @GetMapping()
-    public List<BoardResponse> getBoards(
-            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size
-    ) {
-        return boardService.getBoards(page, size);
-    }
-
     //게시글 상세 조회 Redis 적용 전
-    @GetMapping("/before/{boardId}")
+    @GetMapping("/{boardId}")
     public ResponseEntity<BoardDetailResponse> getBoardBefore(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.getBoardByIdBefore(boardId));
-    }
-
-    //게시글 상세 조회 Redis 적용 후
-    @GetMapping("/{boardId}")
-    public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable Long boardId) {
-        return ResponseEntity.ok(boardService.getBoardById(boardId));
     }
 
     //게시글 수정
@@ -66,7 +50,7 @@ public class BoardController {
         return ResponseEntity.noContent().build();
     }
 
-    //평가
+    //평가 Redis 적용 전
     @PutMapping("/evaluation")
     public ResponseEntity<Double> updateBoardRating(@RequestBody BoardScore boardScore) {
         return ResponseEntity.ok(boardService.updateBoardRating(boardScore));
