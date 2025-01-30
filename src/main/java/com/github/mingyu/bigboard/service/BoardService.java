@@ -8,12 +8,12 @@ import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.repository.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@Deprecated
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -31,21 +31,22 @@ public class BoardService {
     }
 
     //게시글 목록 조회 Redis 적용 전
-    @Cacheable(
-            cacheNames = "getBoards",
-            key = "'boards:page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize",
-            cacheManager = "cacheManager"
-    )
     public Page<BoardProjection> getAllBoardsBefore(Pageable pageable) {
         return boardRepository.findBoardAll(pageable);
     }
 
     //게시글 조회 Redis 적용 전
-    @Transactional
     public BoardDetailResponse getBoardByIdBefore(Long boardId){
-        boardRepository.incrementViewCount(boardId);
-        Board board = boardRepository.findById(boardId).orElse(null);
+        log.info("BoardService::getBoardByIdBefore");
+        this.increaseViewCount(boardId);
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         return BoardDetailResponse.toBoardDetailResponse(board);
+    }
+
+    @Transactional
+    public void increaseViewCount(Long boardId) {
+        boardRepository.incrementViewCount(boardId);
     }
 
     //게시글 수정
@@ -63,6 +64,7 @@ public class BoardService {
     }
 
     //평점 추가 Redis 적용 전
+    @Transactional
     public double updateBoardRating(BoardScore boardScore){
         Board board = boardRepository.findById(boardScore.getBoardId()).orElse(null);
         board.setRatingCount(board.getRatingCount()+1);

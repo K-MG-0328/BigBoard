@@ -9,6 +9,7 @@ import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.repository.RedisBoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -49,6 +50,7 @@ public class RedisBoardService {
 
     //게시글 조회 Redis 적용 후
     public BoardDetailResponse getBoardById(Long boardId) {
+        log.info("RedisBoardService::getBoardById");
         redisViewCountService.incrementViewCount(boardId); //조회수를 캐싱
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));

@@ -34,7 +34,7 @@ public class RedisBoardController {
     }
 
     //게시글 상세 조회 Redis 적용 후
-    @GetMapping("/{boardId}")
+    @GetMapping("/detail/{boardId}")
     public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.getBoardById(boardId));
     }
@@ -53,7 +53,7 @@ public class RedisBoardController {
     }
 
     //평가 Redis 적용 후
-    @PutMapping("/evaluation")
+    @RequestMapping("/evaluation")
     public ResponseEntity<Void> updateBoardRating(@RequestBody BoardScore boardScore) {
         boardService.updateBoardRating(boardScore);
         return ResponseEntity.noContent().build();
