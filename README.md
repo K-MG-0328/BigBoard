@@ -14,11 +14,11 @@ Redis를 활용한 캐싱 및 성능 최적화
 게시판 조회 API에 Redis 적용 전후의 성능을 비교하여 캐시 적용이 응답 속도와 처리량에 미치는 영향을 분석한다.
 
 ### 테스트 환경
-JDK 버전: OpenJDK 11
-프레임워크: Spring Boot 3.4.1
-데이터베이스: MySQL 9.2.0 
-캐시 시스템: Redis 3.4.1
-테스트 도구: nGrinder 3.5.9
+JDK 버전: OpenJDK 11  
+프레임워크: Spring Boot 3.4.1  
+데이터베이스: MySQL 9.2.0   
+캐시 시스템: Redis 3.4.1  
+테스트 도구: nGrinder 3.5.9  
 
 ### 테스트 대상 API   
 •	GET /before/board  --게시글 목록 조회 적용 전  
