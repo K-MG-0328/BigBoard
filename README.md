@@ -38,43 +38,59 @@ JDK 버전: OpenJDK 11
 동시 접속자 수 (Vuser):99명
 
 ### 테스트 절차
-MySQL 데이터베이스에 더미 데이터 100만 개 삽입
-Redis 적용 전, 적용 후 코드 분리 
-nGrinder를 설정하여 부하 테스트 준비
+MySQL 데이터베이스에 더미 데이터 100만 개 삽입  
+Redis 적용 전, 적용 후 코드 분리   
+nGrinder를 설정하여 부하 테스트 준비   
+
+
+![image](https://github.com/user-attachments/assets/c03a1f57-01a7-4c95-a75e-a0e7e815f480)
 
 ### Redis 적용 전 테스트
 #### GET before/board  
+![image](https://github.com/user-attachments/assets/bc86a336-3aa0-4f43-b793-e2d9e18b44d6)
+
 평균 TPS : 125  
 평균 응답 시간(ms) : 786.97  
 에러율(%) : 0   
   
 #### GET /before/board/detail/{boardId}  
-평균 TPS : 2604  
-평균 응답 시간(ms) : 36.5  
+![image](https://github.com/user-attachments/assets/4c68c842-f70c-4688-978a-a84fa634b5ff)
+
+평균 TPS : 2808  
+평균 응답 시간(ms) : 33.64  
 에러율(%) : 0  
   
 #### PUT /before/board/evaluation  
+![image](https://github.com/user-attachments/assets/39fd136e-18df-4c1c-af40-8a51376e3ec5)
+
 평균 TPS : 2063.2  
 평균 응답 시간(ms) : 45.8  
 에러율(%) : 0  
 
 ### Redis 적용 후 테스트  
 #### GET /board  
+![image](https://github.com/user-attachments/assets/d192ad7b-acf2-45a5-8676-d625dd5aa4a8)
+
 평균 TPS : 2473.5  
 평균 응답 시간(ms) : 39  
 에러율(%) : 0  
   
 #### GET /board/detail/{boardId}  
+![image](https://github.com/user-attachments/assets/b01554e6-b5aa-4d73-8cda-cb86c32ddc62)
+
 평균 TPS : 2900.6  
 평균 응답 시간(ms) : 32.6  
 에러율(%) : 0  
   
 #### PUT /board/evaluation
+![image](https://github.com/user-attachments/assets/c5758112-7304-463a-8eb6-a216677cca8f)
+
 평균 TPS : 2176.4  
 평균 응답 시간(ms) : 43.5  
 에러율(%) : 0  
 
 #### 결과
+
 
 #### GET /board (목록 조회)
 
@@ -90,14 +106,14 @@ TPS
 #### GET /board/detail/{boardId} (상세 조회)
 
 TPS
-	•	적용 전: 2604
+	•	적용 전: 2808
 	•	적용 후: 2900.6
-	•	개선 정도: 약 296.6 TPS 상승 (약 11.4% 증가)
+	•	개선 정도: 약 92.6 TPS 상승 (약 3.3% 증가)
 
 평균 응답 시간
-	•	적용 전: 36.5 ms
+	•	적용 전: 33.64 ms
 	•	적용 후: 32.6 ms
-	•	개선 정도: 약 3.9 ms 단축 (약 10.7% 개선)
+	•	개선 정도: 약 1.04 ms 단축 (약 3.1% 개선)
   
 #### PUT /board/evaluation (평가 등록/갱신)
 
