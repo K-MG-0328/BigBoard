@@ -10,21 +10,20 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/board")
 @RequiredArgsConstructor
 public class RedisBoardController {
 
     private final RedisBoardService boardService;
 
     //게시글 생성
-    @PostMapping
+    @PostMapping("/board")
     public ResponseEntity<BoardDetailResponse> createBoard(@RequestBody BoardDetailRequest request) {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
         return ResponseEntity.ok(boardService.createBoard(boardDetail));
     }
 
     //게시글 목록 조회 Redis 적용 후
-    @GetMapping()
+    @GetMapping("/board")
     public List<BoardResponse> getBoards(
             @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size
     ) {
@@ -32,27 +31,27 @@ public class RedisBoardController {
     }
 
     //게시글 상세 조회 Redis 적용 후
-    @GetMapping("/detail/{boardId}")
+    @GetMapping("/board/detail/{boardId}")
     public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.getBoardById(boardId));
     }
 
     //게시글 수정
-    @PutMapping("/{boardId}")
+    @PutMapping("/board/{boardId}")
     public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request) {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
         return ResponseEntity.ok(boardService.updateBoard(boardDetail));
     }
 
     //게시글 삭제
-    @DeleteMapping("/{boardId}")
-    public ResponseEntity<Void> deletBoard(@PathVariable Long boardId) {
+    @DeleteMapping("/board/{boardId}")
+    public ResponseEntity<Void> deleteBoard(@PathVariable Long boardId) {
         boardService.deleteBoard(boardId);
         return ResponseEntity.noContent().build();
     }
 
     //평가 Redis 적용 후
-    @RequestMapping("/evaluation")
+    @RequestMapping("/board/evaluation")
     public ResponseEntity<Void> updateBoardRating(@RequestBody BoardScoreRequest request) {
         BoardScoreServiceRequest boardScore = request.toBoardScoreServiceRequest();
         boardService.updateBoardRating(boardScore);
