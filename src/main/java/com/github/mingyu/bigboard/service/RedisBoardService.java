@@ -1,9 +1,6 @@
 package com.github.mingyu.bigboard.service;
 
-import com.github.mingyu.bigboard.dto.BoardDetailRequest;
-import com.github.mingyu.bigboard.dto.BoardDetailResponse;
-import com.github.mingyu.bigboard.dto.BoardResponse;
-import com.github.mingyu.bigboard.dto.BoardScore;
+import com.github.mingyu.bigboard.dto.*;
 import com.github.mingyu.bigboard.entity.Board;
 import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.repository.RedisBoardRepository;
@@ -28,8 +25,8 @@ public class RedisBoardService {
     private final RedisRatingDataService redisRatingDataService;
 
     //게시글 생성
-    public BoardDetailResponse createBoard(BoardDetailRequest boardDetailRequest) {
-        Board board = Board.toBoard(boardDetailRequest);
+    public BoardDetailResponse createBoard(BoardDetailServiceRequest boardDetail) {
+        Board board = Board.toBoard(boardDetail);
         boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }
@@ -58,7 +55,7 @@ public class RedisBoardService {
     }
 
     //게시글 수정
-    public BoardDetailResponse updateBoard(BoardDetailRequest updateBoard){
+    public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard){
         Board board = boardRepository.findById(updateBoard.getBoardId()).orElse(null);
         board.setContent(updateBoard.getContent());
         board.setUpdatedAt(updateBoard.getUpdatedAt());
@@ -72,7 +69,7 @@ public class RedisBoardService {
     }
 
     //평점 추가 Redis 적용 후
-    public void updateBoardRating(BoardScore boardScore){
+    public void updateBoardRating(BoardScoreServiceRequest boardScore){
         //평점을 추가 했을 경우 레디스에 저장.
         redisRatingDataService.updateBoardRating(boardScore);
     }

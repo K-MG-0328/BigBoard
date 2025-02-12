@@ -1,8 +1,6 @@
 package com.github.mingyu.bigboard.service;
 
-import com.github.mingyu.bigboard.dto.BoardDetailRequest;
-import com.github.mingyu.bigboard.dto.BoardDetailResponse;
-import com.github.mingyu.bigboard.dto.BoardScore;
+import com.github.mingyu.bigboard.dto.*;
 import com.github.mingyu.bigboard.entity.Board;
 import com.github.mingyu.bigboard.projection.BoardProjection;
 import com.github.mingyu.bigboard.repository.BoardRepository;
@@ -20,18 +18,17 @@ import org.springframework.stereotype.Service;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final RedisViewCountService redisViewCountService;
-    private final RedisRatingDataService redisRatingDataService;
 
     //게시글 생성
-    public BoardDetailResponse createBoard(BoardDetailRequest boardDetailRequest) {
-        Board board = Board.toBoard(boardDetailRequest);
+    public BoardDetailResponse createBoard(BoardDetailServiceRequest boardDetail) {
+        Board board = Board.toBoard(boardDetail);
         boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }
 
     //게시글 목록 조회 Redis 적용 전
     public Page<BoardProjection> getAllBoardsBefore(Pageable pageable) {
+        log.info("getAllBoardsBefore");
         return boardRepository.findBoardAll(pageable);
     }
 
@@ -50,7 +47,7 @@ public class BoardService {
     }
 
     //게시글 수정
-    public BoardDetailResponse updateBoard(BoardDetailRequest updateBoard){
+    public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard){
         Board board = boardRepository.findById(updateBoard.getBoardId()).orElse(null);
         board.setContent(updateBoard.getContent());
         board.setUpdatedAt(updateBoard.getUpdatedAt());
@@ -65,7 +62,7 @@ public class BoardService {
 
     //평점 추가 Redis 적용 전
     @Transactional
-    public double updateBoardRating(BoardScore boardScore){
+    public double updateBoardRating(BoardScoreServiceRequest boardScore){
         Board board = boardRepository.findById(boardScore.getBoardId()).orElse(null);
         board.setRatingCount(board.getRatingCount()+1);
         board.setTotalScore(board.getTotalScore() + boardScore.getScore());

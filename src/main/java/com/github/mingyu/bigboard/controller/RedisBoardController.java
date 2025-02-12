@@ -1,9 +1,6 @@
 package com.github.mingyu.bigboard.controller;
 
-import com.github.mingyu.bigboard.dto.BoardDetailRequest;
-import com.github.mingyu.bigboard.dto.BoardDetailResponse;
-import com.github.mingyu.bigboard.dto.BoardResponse;
-import com.github.mingyu.bigboard.dto.BoardScore;
+import com.github.mingyu.bigboard.dto.*;
 import com.github.mingyu.bigboard.service.RedisBoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +18,9 @@ public class RedisBoardController {
 
     //게시글 생성
     @PostMapping
-    public ResponseEntity<BoardDetailResponse> createBoard(@RequestBody BoardDetailRequest board) {
-        return ResponseEntity.ok(boardService.createBoard(board));
+    public ResponseEntity<BoardDetailResponse> createBoard(@RequestBody BoardDetailRequest request) {
+        BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
+        return ResponseEntity.ok(boardService.createBoard(boardDetail));
     }
 
     //게시글 목록 조회 Redis 적용 후
@@ -41,8 +39,9 @@ public class RedisBoardController {
 
     //게시글 수정
     @PutMapping("/{boardId}")
-    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest board) {
-        return ResponseEntity.ok(boardService.updateBoard(board));
+    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request) {
+        BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
+        return ResponseEntity.ok(boardService.updateBoard(boardDetail));
     }
 
     //게시글 삭제
@@ -54,7 +53,8 @@ public class RedisBoardController {
 
     //평가 Redis 적용 후
     @RequestMapping("/evaluation")
-    public ResponseEntity<Void> updateBoardRating(@RequestBody BoardScore boardScore) {
+    public ResponseEntity<Void> updateBoardRating(@RequestBody BoardScoreRequest request) {
+        BoardScoreServiceRequest boardScore = request.toBoardScoreServiceRequest();
         boardService.updateBoardRating(boardScore);
         return ResponseEntity.noContent().build();
     }

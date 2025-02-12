@@ -1,6 +1,6 @@
 package com.github.mingyu.bigboard.service;
 
-import com.github.mingyu.bigboard.dto.BoardScore;
+import com.github.mingyu.bigboard.dto.BoardScoreServiceRequest;
 import com.github.mingyu.bigboard.projection.BoardScoreProjection;
 import com.github.mingyu.bigboard.repository.RedisBoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class RedisRatingDataService {
         return keys != null ? keys : Set.of(); // keys가 null이면 빈 Set 반환
     }
 
-    public void updateBoardRating(BoardScore boardScore) {
+    public void updateBoardRating(BoardScoreServiceRequest boardScore) {
         Long boardId = boardScore.getBoardId();
         double Score = boardScore.getScore();
         String key = "board:" + boardId + ":ratingData";

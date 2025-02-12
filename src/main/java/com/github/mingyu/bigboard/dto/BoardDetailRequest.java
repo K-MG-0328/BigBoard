@@ -5,7 +5,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -17,5 +16,16 @@ public class BoardDetailRequest {
     private String authorId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public BoardDetailServiceRequest toBoardDetailServiceRequest(){
+        return BoardDetailServiceRequest.builder()
+                .boardId(this.boardId)
+                .title(this.title)
+                .content(this.content)
+                .authorId(this.authorId)
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
+                .build();
+    }
 
 }
