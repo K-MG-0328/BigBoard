@@ -33,7 +33,7 @@ public class RedisBoardService {
 
     //게시글 목록 조회 Redis 적용 후
     @Cacheable(cacheNames = "getBoards", key = "'boards:page:' + #page + ':size:' + #size", cacheManager = "cacheManager")
-    public List<BoardResponse> getBoards(int page, int size) {
+    public BoardListResponse getBoards(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<BoardProjection> pageOfBoards = boardRepository.findBoardAll(pageable);
 
@@ -41,8 +41,13 @@ public class RedisBoardService {
                 .stream()
                 .map(projection -> new BoardResponse().toBoardResponse(projection))
                 .toList();
+        BoardListResponse boardListResponse = new BoardListResponse();
+        boardListResponse.setBoards(boardResponseList);
+        boardListResponse.setPageCnt(pageOfBoards.getNumberOfElements());
+        boardListResponse.setBoardCnt(pageOfBoards.getTotalElements());
+        boardListResponse.setCurrentPage(page);
 
-        return boardResponseList;
+        return boardListResponse;
     }
 
     //게시글 조회 Redis 적용 후

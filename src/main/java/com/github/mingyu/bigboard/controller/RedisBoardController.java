@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +22,7 @@ public class RedisBoardController {
 
     //게시글 목록 조회 Redis 적용 후
     @GetMapping("/board")
-    public List<BoardResponse> getBoards(
+    public BoardListResponse getBoards(
             @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size
     ) {
         return boardService.getBoards(page, size);
