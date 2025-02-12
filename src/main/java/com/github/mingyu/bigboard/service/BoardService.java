@@ -48,7 +48,7 @@ public class BoardService {
 
     //게시글 수정
     public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard){
-        Board board = boardRepository.findById(updateBoard.getBoardId()).orElse(null);
+        Board board = boardRepository.findById(updateBoard.getBoardId()).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         board.setContent(updateBoard.getContent());
         board.setUpdatedAt(updateBoard.getUpdatedAt());
         boardRepository.save(board);
@@ -63,7 +63,7 @@ public class BoardService {
     //평점 추가 Redis 적용 전
     @Transactional
     public double updateBoardRating(BoardScoreServiceRequest boardScore){
-        Board board = boardRepository.findById(boardScore.getBoardId()).orElse(null);
+        Board board = boardRepository.findById(boardScore.getBoardId()).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         board.setRatingCount(board.getRatingCount()+1);
         board.setTotalScore(board.getTotalScore() + boardScore.getScore());
         boardRepository.save(board);

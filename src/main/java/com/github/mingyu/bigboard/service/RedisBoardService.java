@@ -56,7 +56,7 @@ public class RedisBoardService {
 
     //게시글 수정
     public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard){
-        Board board = boardRepository.findById(updateBoard.getBoardId()).orElse(null);
+        Board board = boardRepository.findById(updateBoard.getBoardId()).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         board.setContent(updateBoard.getContent());
         board.setUpdatedAt(updateBoard.getUpdatedAt());
         boardRepository.save(board);
