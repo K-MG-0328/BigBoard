@@ -26,7 +26,7 @@ public class RedisBoardService {
 
     //게시글 생성
     public BoardDetailResponse createBoard(BoardDetailServiceRequest boardDetail) {
-        Board board = Board.toBoard(boardDetail);
+        Board board = boardDetail.toBoard();
         boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.github.mingyu.bigboard.dto.BoardDetailServiceRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -76,16 +75,4 @@ public class Board {
     public void setTotalScore(double totalScore) {
         this.totalScore = totalScore;
     }
-
-    public static Board toBoard(BoardDetailServiceRequest boardDetail) {
-        return Board.builder()
-                .boardId(boardDetail.getBoardId())
-                .title(boardDetail.getTitle())
-                .content(boardDetail.getContent())
-                .authorId(boardDetail.getAuthorId())
-                .createdAt(boardDetail.getCreatedAt() != null ? boardDetail.getCreatedAt() : LocalDateTime.now())
-                .updatedAt(boardDetail.getUpdatedAt() != null ? boardDetail.getUpdatedAt() : LocalDateTime.now())
-                .build();
-    }
-
 }
