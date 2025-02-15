@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+
 @RestController
 @RequiredArgsConstructor
 public class BoardController {
@@ -36,16 +38,17 @@ public class BoardController {
     }
 
     //게시글 수정
-    @PutMapping("/before/board/{boardId}")
-    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request) {
+    @PutMapping("/before/board/{boardId}/{userId}")
+    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request, @PathVariable String userId) throws AccessDeniedException {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
-        return ResponseEntity.ok(boardService.updateBoard(boardDetail));
+        return ResponseEntity.ok(boardService.updateBoard(boardDetail, userId));
     }
 
     //게시글 삭제
-    @DeleteMapping("/before/board/{boardId}")
-    public ResponseEntity<Void> deletBoard(@PathVariable Long boardId) {
-        boardService.deleteBoard(boardId);
+    @DeleteMapping("/before/board/{boardId}/{userId}")
+    public ResponseEntity<Void> deletBoard(@RequestBody BoardDetailRequest request, @PathVariable String userId) throws AccessDeniedException {
+        BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
+        boardService.deleteBoard(boardDetail, userId);
         return ResponseEntity.noContent().build();
     }
 

@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
+
 @Slf4j
 @Service
 @Transactional
@@ -47,7 +49,12 @@ public class BoardService {
     }
 
     //게시글 수정
-    public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard){
+    public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard, String userId) throws AccessDeniedException {
+
+        if (!updateBoard.getAuthorId().equals(userId)) {
+            throw new AccessDeniedException("본인이 작성한 글이 아닙니다.");
+        }
+
         Board board = boardRepository.findById(updateBoard.getBoardId()).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         board.setContent(updateBoard.getContent());
         board.setUpdatedAt(updateBoard.getUpdatedAt());
@@ -56,8 +63,13 @@ public class BoardService {
     }
 
     //게시글 삭제
-    public void deleteBoard(Long boardId){
-        boardRepository.deleteById(boardId);
+    public void deleteBoard(BoardDetailServiceRequest deleteBoard, String userId) throws AccessDeniedException {
+
+        if (!deleteBoard.getAuthorId().equals(userId)) {
+            throw new AccessDeniedException("본인이 작성한 글이 아닙니다.");
+        }
+
+        boardRepository.deleteById(deleteBoard.getBoardId());
     }
 
     //평점 추가 Redis 적용 전
