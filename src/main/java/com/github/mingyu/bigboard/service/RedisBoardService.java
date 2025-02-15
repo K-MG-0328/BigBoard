@@ -53,9 +53,15 @@ public class RedisBoardService {
     //게시글 조회 Redis 적용 후
     public BoardDetailResponse getBoardById(Long boardId) {
         log.info("RedisBoardService::getBoardById");
+
+        String key = "board:" + boardId + ":viewCount";
+
         redisViewCountService.incrementViewCount(boardId); //조회수를 캐싱
+        int viewCount = redisViewCountService.getViewCount(key);
+
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+        board.setViewCount(viewCount);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }
 

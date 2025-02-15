@@ -4,6 +4,7 @@ import com.github.mingyu.bigboard.repository.RedisBoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class RedisViewCountService {
         return value != null ? Integer.parseInt(value) : 0;
     }
 
+    @Async
     public void incrementViewCount(Long boardId) {
         String key = "board:" + boardId + ":viewCount"; // 키 생성
 

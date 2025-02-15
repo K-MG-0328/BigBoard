@@ -75,4 +75,8 @@ public class Board {
     public void setTotalScore(double totalScore) {
         this.totalScore = totalScore;
     }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
 }

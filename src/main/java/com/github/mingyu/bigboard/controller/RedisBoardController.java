@@ -29,7 +29,7 @@ public class RedisBoardController {
     }
 
     //게시글 상세 조회 Redis 적용 후
-    @GetMapping("/board/detail/{boardId}")
+    @GetMapping("/board/{boardId}")
     public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.getBoardById(boardId));
     }
