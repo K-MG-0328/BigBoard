@@ -93,8 +93,8 @@ public class RedisBoardService {
     }
 
     //평점 추가 Redis 적용 후
-    public void updateBoardRating(BoardScoreServiceRequest boardScore){
+    public BoardDetailResponse updateBoardRating(BoardScoreServiceRequest boardScore){
         //평점을 추가 했을 경우 레디스에 저장.
-        redisRatingDataService.updateBoardRating(boardScore);
+        return redisRatingDataService.updateBoardRating(boardScore);
     }
 }

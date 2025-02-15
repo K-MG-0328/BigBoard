@@ -54,9 +54,9 @@ public class RedisBoardController {
 
     //평가 Redis 적용 후
     @RequestMapping("/board/evaluation")
-    public ResponseEntity<Void> updateBoardRating(@RequestBody BoardScoreRequest request) {
+    public ResponseEntity<BoardDetailResponse> updateBoardRating(@RequestBody BoardScoreRequest request) {
         BoardScoreServiceRequest boardScore = request.toBoardScoreServiceRequest();
-        boardService.updateBoardRating(boardScore);
-        return ResponseEntity.noContent().build();
+        BoardDetailResponse boardDetailResponse =  boardService.updateBoardRating(boardScore);
+        return ResponseEntity.ok(boardDetailResponse);
     }
 }

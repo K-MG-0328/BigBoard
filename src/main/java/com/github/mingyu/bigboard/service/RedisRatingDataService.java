@@ -1,5 +1,6 @@
 package com.github.mingyu.bigboard.service;
 
+import com.github.mingyu.bigboard.dto.BoardDetailResponse;
 import com.github.mingyu.bigboard.dto.BoardScoreServiceRequest;
 import com.github.mingyu.bigboard.projection.BoardScoreProjection;
 import com.github.mingyu.bigboard.repository.RedisBoardRepository;
@@ -56,7 +57,7 @@ public class RedisRatingDataService {
         return keys != null ? keys : Set.of(); // keys가 null이면 빈 Set 반환
     }
 
-    public void updateBoardRating(BoardScoreServiceRequest boardScore) {
+    public BoardDetailResponse updateBoardRating(BoardScoreServiceRequest boardScore) {
         Long boardId = boardScore.getBoardId();
         double Score = boardScore.getScore();
         String key = "board:" + boardId + ":ratingData";
@@ -79,6 +80,11 @@ public class RedisRatingDataService {
         redisTemplate.opsForHash().increment(key, "ratingCount", 1);
         redisTemplate.opsForHash().increment(key, "totalScore", Score);
         redisTemplate.expire(key, Duration.ofMinutes(5));
+
+        syncRatingData(boardId, getTotalScore(key), getRatingCount(key));
+
+        BoardDetailResponse boardDetailResponse = boardScore.toBoardDetailResponse();
+        return boardDetailResponse;
     }
 
     public double getTotalScore(String key) {
