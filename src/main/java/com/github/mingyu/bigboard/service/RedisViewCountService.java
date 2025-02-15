@@ -31,14 +31,20 @@ public class RedisViewCountService {
     public void incrementViewCount(Long boardId) {
         String key = "board:" + boardId + ":viewCount"; // 키 생성
 
-        /* TTL로 레디스에서 캐시가 사라지게 되면 조회수가 초기화될 가능성이 있으므로 검증로직을 추가*/
-        synchronized (this) { // 동시성 문제를 방지하기 위해 동기화 블록 추가
-            if (!redisTemplate.hasKey(key)) { // 레디스에 키가 존재하는지 검증
-                int viewCount = boardRepository.getViewCount(boardId);
-                redisTemplate.opsForValue().set(key, String.valueOf(viewCount), Duration.ofDays(1L)); // TTL 설정
-            }
-            redisTemplate.opsForValue().increment(key); // 키의 viewCount 값 증가
+        // 키가 없으면 (원자적으로) "0" 을 세팅하고 true 반환,
+        // 키가 있으면 false 반환
+        Boolean chkKey = redisTemplate
+                .opsForValue()
+                .setIfAbsent(key, "0", Duration.ofMinutes(5));
+
+        if (chkKey) {
+            int viewCount = boardRepository.getViewCount(boardId);
+            redisTemplate.opsForValue().set(key, String.valueOf(viewCount), Duration.ofMinutes(5));
         }
+
+        redisTemplate.opsForValue().increment(key); // 키의 viewCount 값 증가
+        redisTemplate.expire(key, Duration.ofMinutes(5)); //ttl과 db 싱크하는 주기가 엇갈린다면 데이터 유실이 발생할 수 있음 expire 추가함으로써 방지
+
     }
 
     @Transactional

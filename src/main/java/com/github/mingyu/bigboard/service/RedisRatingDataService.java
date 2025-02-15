@@ -30,23 +30,24 @@ public class RedisRatingDataService {
         double Score = boardScore.getScore();
         String key = "board:" + boardId + ":ratingData";
 
-        synchronized (this) { // 동시성 문제를 방지하기 위해 동기화 블록 추가
-            if (!redisTemplate.hasKey(key)) { // 레디스에 키가 존재하는지 검증
-                BoardScoreProjection ratingData = boardRepository.getRatingData(boardScore.getBoardId());
+        Boolean chkKey = redisTemplate
+                .opsForValue()
+                .setIfAbsent(key, "0", Duration.ofMinutes(5));
 
-                int ratingCount = ratingData.getRatingCount()+1;
-                double totalScore = ratingData.getTotalScore() + boardScore.getScore();
+        if (chkKey) { // 레디스에 키가 존재하는지 검증
+            BoardScoreProjection ratingData = boardRepository.getRatingData(boardScore.getBoardId());
 
-                redisTemplate.opsForHash().put(key, "totalScore", String.valueOf(totalScore));
-                redisTemplate.opsForHash().put(key, "ratingCount", String.valueOf(ratingCount));
-                redisTemplate.expire(key, Duration.ofDays(1));
-            }
+            int ratingCount = ratingData.getRatingCount()+1;
+            double totalScore = ratingData.getTotalScore() + boardScore.getScore();
 
-            redisTemplate.opsForHash().increment(key, "ratingCount", 1);
-            Object totalScoreObj = redisTemplate.opsForHash().get(key, "totalScore");
-            double totalScore = Double.parseDouble(String.valueOf(totalScoreObj));
-            redisTemplate.opsForHash().put(key, "totalScore", String.valueOf(totalScore + Score));
+            redisTemplate.opsForHash().put(key, "totalScore", String.valueOf(totalScore));
+            redisTemplate.opsForHash().put(key, "ratingCount", String.valueOf(ratingCount));
+            redisTemplate.expire(key, Duration.ofMinutes(5));
         }
+
+        redisTemplate.opsForHash().increment(key, "ratingCount", 1);
+        redisTemplate.opsForHash().increment(key, "totalScore", Score);
+        redisTemplate.expire(key, Duration.ofMinutes(5));
     }
 
     public double getTotalScore(String key) {
