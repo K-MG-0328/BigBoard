@@ -5,11 +5,16 @@ import com.github.mingyu.bigboard.projection.BoardScoreProjection;
 import com.github.mingyu.bigboard.repository.RedisBoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ConvertingCursor;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
@@ -21,7 +26,33 @@ public class RedisRatingDataService {
     private final RedisBoardRepository boardRepository;
 
     public Set<String> getAllKeys(String pattern) {
-        Set<String> keys = redisTemplate.keys(pattern); //특정 패턴에 매칭되는 키 검색
+        Set<String> keys = new HashSet<>();
+        long cursor = 0;
+
+        do{
+            ScanOptions options = ScanOptions.scanOptions()
+                    .match(pattern)
+                    .count(100)
+                    .build();
+
+            Cursor<byte[]> redisCursor = redisTemplate
+                    .executeWithStickyConnection(
+                            redisConnection -> redisConnection.scan(options)
+                    );
+
+            Cursor<String> convertingCursor = new ConvertingCursor<>(redisCursor,
+                    bytes -> new String(bytes, StandardCharsets.UTF_8)
+            );
+
+            while (convertingCursor.hasNext()) {
+                keys.add(convertingCursor.next());
+            }
+
+            cursor = convertingCursor.getCursorId();
+
+
+        }while(!(cursor == 0)); //cursor가 0이 되면 스캔 종료
+
         return keys != null ? keys : Set.of(); // keys가 null이면 빈 Set 반환
     }
 
