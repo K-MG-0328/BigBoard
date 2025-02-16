@@ -1,15 +1,21 @@
 package com.github.mingyu.bigboard.service;
 
+import com.github.mingyu.bigboard.dto.BoardDetailResponse;
 import com.github.mingyu.bigboard.dto.BoardScoreServiceRequest;
 import com.github.mingyu.bigboard.projection.BoardScoreProjection;
 import com.github.mingyu.bigboard.repository.RedisBoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ConvertingCursor;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -19,33 +25,90 @@ public class RedisRatingDataService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisBoardRepository boardRepository;
+    private final RedisRatingSyncService redisRatingSyncService;
 
     public Set<String> getAllKeys(String pattern) {
-        Set<String> keys = redisTemplate.keys(pattern); //특정 패턴에 매칭되는 키 검색
+        Set<String> keys = new HashSet<>();
+        long cursor = 0;
+
+        do{
+            ScanOptions options = ScanOptions.scanOptions()
+                    .match(pattern)
+                    .count(100)
+                    .build();
+
+            Cursor<byte[]> redisCursor = redisTemplate
+                    .executeWithStickyConnection(
+                            redisConnection -> redisConnection.scan(options)
+                    );
+
+            Cursor<String> convertingCursor = new ConvertingCursor<>(redisCursor,
+                    bytes -> new String(bytes, StandardCharsets.UTF_8)
+            );
+
+            while (convertingCursor.hasNext()) {
+                keys.add(convertingCursor.next());
+            }
+
+            cursor = convertingCursor.getCursorId();
+
+
+        }while(!(cursor == 0)); //cursor가 0이 되면 스캔 종료
+
         return keys != null ? keys : Set.of(); // keys가 null이면 빈 Set 반환
     }
 
-    public void updateBoardRating(BoardScoreServiceRequest boardScore) {
+
+    public BoardDetailResponse updateBoardRating(BoardScoreServiceRequest boardScore) {
         Long boardId = boardScore.getBoardId();
-        double Score = boardScore.getScore();
+        double score = boardScore.getScore();
         String key = "board:" + boardId + ":ratingData";
 
-        synchronized (this) { // 동시성 문제를 방지하기 위해 동기화 블록 추가
-            if (!redisTemplate.hasKey(key)) { // 레디스에 키가 존재하는지 검증
-                BoardScoreProjection ratingData = boardRepository.getRatingData(boardScore.getBoardId());
+        Map<Object, Object> ratingMap = redisTemplate.opsForHash().entries(key);
 
-                int ratingCount = ratingData.getRatingCount()+1;
-                double totalScore = ratingData.getTotalScore() + boardScore.getScore();
+        if (!ratingMap.isEmpty()) {
+            log.info("캐시 히트. boardId={}, key={}", boardId, key);
 
-                redisTemplate.opsForHash().put(key, "totalScore", String.valueOf(totalScore));
-                redisTemplate.opsForHash().put(key, "ratingCount", String.valueOf(ratingCount));
-                redisTemplate.expire(key, Duration.ofDays(1));
-            }
+            double currentTotalScore = Double.parseDouble((String) ratingMap.get("totalScore"));
+            int currentRatingCount = Integer.parseInt((String) ratingMap.get("ratingCount"));
 
-            redisTemplate.opsForHash().increment(key, "ratingCount", 1);
-            Object totalScoreObj = redisTemplate.opsForHash().get(key, "totalScore");
-            double totalScore = Double.parseDouble(String.valueOf(totalScoreObj));
-            redisTemplate.opsForHash().put(key, "totalScore", String.valueOf(totalScore + Score));
+            double newTotalScore = currentTotalScore + score;
+            int newRatingCount = currentRatingCount + 1;
+
+            redisTemplate.opsForHash().put(key, "totalScore", String.valueOf(newTotalScore));
+            redisTemplate.opsForHash().put(key, "ratingCount", String.valueOf(newRatingCount));
+            redisTemplate.expire(key, Duration.ofMinutes(5)); // TTL 갱신
+
+            redisRatingSyncService.syncRatingData(boardId, newTotalScore, newRatingCount);
+
+            boardScore.setTotalScore(newTotalScore);
+            boardScore.setRatingCount(newRatingCount);
+            BoardDetailResponse boardDetailResponse = boardScore.toBoardDetailResponse();
+            return boardDetailResponse;
+
+        } else {
+            log.info("캐시 미스. boardId={}, key={}", boardId, key);
+
+            // DB 조회
+            BoardScoreProjection ratingData = boardRepository.getRatingData(boardId);
+            double currentTotalScore = ratingData.getTotalScore();
+            int currentRatingCount   = ratingData.getRatingCount();
+
+            // 새 점수를 반영
+            double newTotalScore = currentTotalScore + score;
+            int newRatingCount = currentRatingCount + 1;
+
+            // 캐시에 저장
+            redisTemplate.opsForHash().put(key, "totalScore", String.valueOf(newTotalScore));
+            redisTemplate.opsForHash().put(key, "ratingCount", String.valueOf(newRatingCount));
+            redisTemplate.expire(key, Duration.ofMinutes(5));
+
+            redisRatingSyncService.syncRatingData(boardId, newTotalScore, newRatingCount);
+
+            boardScore.setTotalScore(newTotalScore);
+            boardScore.setRatingCount(newRatingCount);
+            BoardDetailResponse boardDetailResponse = boardScore.toBoardDetailResponse();
+            return boardDetailResponse;
         }
     }
 
@@ -61,11 +124,6 @@ public class RedisRatingDataService {
         int ratingCount = Integer.parseInt(String.valueOf(totalScoreObj));
         log.info("getRatingCount:ratingCount {}", ratingCount);
         return ratingCount;
-    }
-
-    @Transactional
-    public void syncRatingData(Long boardId, double totalScore, int ratingCount) {
-        boardRepository.updateRatingData(boardId, totalScore, ratingCount);
     }
 
 }

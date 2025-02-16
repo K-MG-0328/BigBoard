@@ -11,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
 @Transactional
@@ -21,7 +24,7 @@ public class BoardService {
 
     //게시글 생성
     public BoardDetailResponse createBoard(BoardDetailServiceRequest boardDetail) {
-        Board board = Board.toBoard(boardDetail);
+        Board board = boardDetail.toBoard();
         boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }
@@ -47,23 +50,33 @@ public class BoardService {
     }
 
     //게시글 수정
-    public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard){
-        Board board = boardRepository.findById(updateBoard.getBoardId()).orElse(null);
+    public BoardDetailResponse updateBoard(BoardDetailServiceRequest updateBoard, String userId) throws AccessDeniedException {
+
+        if (!updateBoard.getAuthorId().equals(userId)) {
+            throw new AccessDeniedException("본인이 작성한 글이 아닙니다.");
+        }
+
+        Board board = boardRepository.findById(updateBoard.getBoardId()).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         board.setContent(updateBoard.getContent());
-        board.setUpdatedAt(updateBoard.getUpdatedAt());
+        board.setUpdatedAt(LocalDateTime.now());
         boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }
 
     //게시글 삭제
-    public void deleteBoard(Long boardId){
-        boardRepository.deleteById(boardId);
+    public void deleteBoard(BoardDetailServiceRequest deleteBoard, String userId) throws AccessDeniedException {
+
+        if (!deleteBoard.getAuthorId().equals(userId)) {
+            throw new AccessDeniedException("본인이 작성한 글이 아닙니다.");
+        }
+
+        boardRepository.deleteById(deleteBoard.getBoardId());
     }
 
     //평점 추가 Redis 적용 전
     @Transactional
     public double updateBoardRating(BoardScoreServiceRequest boardScore){
-        Board board = boardRepository.findById(boardScore.getBoardId()).orElse(null);
+        Board board = boardRepository.findById(boardScore.getBoardId()).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         board.setRatingCount(board.getRatingCount()+1);
         board.setTotalScore(board.getTotalScore() + boardScore.getScore());
         boardRepository.save(board);

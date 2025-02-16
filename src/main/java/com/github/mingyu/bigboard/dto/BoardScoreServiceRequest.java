@@ -16,4 +16,11 @@ public class BoardScoreServiceRequest {
     public double getAverageScore() {
         return ratingCount == 0 ? 0 : totalScore / ratingCount;
     }
+
+    public BoardDetailResponse toBoardDetailResponse() {
+        return BoardDetailResponse.builder()
+                .boardId(this.boardId)
+                .rating(getAverageScore())
+                .build();
+    }
 }

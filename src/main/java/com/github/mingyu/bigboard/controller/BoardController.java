@@ -9,8 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+
 @RestController
-@RequestMapping("/before/board")
 @RequiredArgsConstructor
 public class BoardController {
 
@@ -18,40 +19,41 @@ public class BoardController {
 
 
     //게시글 생성
-    @PostMapping
+    @PostMapping("/before/board")
     public ResponseEntity<BoardDetailResponse> createBoard(@RequestBody BoardDetailRequest request) {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
         return ResponseEntity.ok(boardService.createBoard(boardDetail));
     }
 
     //게시글 목록 조회 Redis 적용 전
-    @GetMapping
+    @GetMapping("/before/board")
     public ResponseEntity<Page<BoardProjection>> getBoards(Pageable pageable) {
         return ResponseEntity.ok(boardService.getAllBoardsBefore(pageable));
     }
 
     //게시글 상세 조회 Redis 적용 전
-    @GetMapping("/detail/{boardId}")
+    @GetMapping("/before/board/{boardId}")
     public ResponseEntity<BoardDetailResponse> getBoardBefore(@PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.getBoardByIdBefore(boardId));
     }
 
     //게시글 수정
-    @PutMapping("/{boardId}")
-    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request) {
+    @PutMapping("/before/board/{boardId}")
+    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request, @RequestParam String userId) throws AccessDeniedException {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
-        return ResponseEntity.ok(boardService.updateBoard(boardDetail));
+        return ResponseEntity.ok(boardService.updateBoard(boardDetail, userId));
     }
 
     //게시글 삭제
-    @DeleteMapping("/{boardId}")
-    public ResponseEntity<Void> deletBoard(@PathVariable Long boardId) {
-        boardService.deleteBoard(boardId);
+    @DeleteMapping("/before/board/{boardId}")
+    public ResponseEntity<Void> deletBoard(@RequestBody BoardDetailRequest request, @RequestParam String userId) throws AccessDeniedException {
+        BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
+        boardService.deleteBoard(boardDetail, userId);
         return ResponseEntity.noContent().build();
     }
 
     //평가 Redis 적용 전
-    @RequestMapping("/evaluation")
+    @RequestMapping("/before/board/evaluation")
     public ResponseEntity<Double> updateBoardRating(@RequestBody BoardScoreRequest request) {
         BoardScoreServiceRequest boardScore = request.toBoardScoreServiceRequest();
         return ResponseEntity.ok(boardService.updateBoardRating(boardScore));
