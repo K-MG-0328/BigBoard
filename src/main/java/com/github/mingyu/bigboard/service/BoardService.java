@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -57,7 +58,7 @@ public class BoardService {
 
         Board board = boardRepository.findById(updateBoard.getBoardId()).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
         board.setContent(updateBoard.getContent());
-        board.setUpdatedAt(updateBoard.getUpdatedAt());
+        board.setUpdatedAt(LocalDateTime.now());
         boardRepository.save(board);
         return BoardDetailResponse.toBoardDetailResponse(board);
     }

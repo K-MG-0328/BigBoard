@@ -37,16 +37,16 @@ public class RedisBoardController {
     }
 
     //게시글 수정
-    @PutMapping("/board/{boardId}/{userId}")
-    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request, @PathVariable String userId) throws AccessDeniedException {
+    @PutMapping("/board/{boardId}")
+    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request, @RequestParam String userId) throws AccessDeniedException {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
         BoardDetailResponse boardDetailResponse =  boardService.updateBoard(boardDetail, userId);
         return ResponseEntity.ok(boardDetailResponse);
     }
 
     //게시글 삭제
-    @DeleteMapping("/board/{boardId}/{userId}")
-    public ResponseEntity<Void> deleteBoard(@RequestBody BoardDetailRequest request, @PathVariable String userId) throws AccessDeniedException {
+    @DeleteMapping("/board/{boardId}")
+    public ResponseEntity<Void> deleteBoard(@RequestBody BoardDetailRequest request, @RequestParam String userId) throws AccessDeniedException {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
         boardService.deleteBoard(boardDetail , userId);
         return ResponseEntity.noContent().build();

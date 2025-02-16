@@ -38,15 +38,15 @@ public class BoardController {
     }
 
     //게시글 수정
-    @PutMapping("/before/board/{boardId}/{userId}")
-    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request, @PathVariable String userId) throws AccessDeniedException {
+    @PutMapping("/before/board/{boardId}")
+    public ResponseEntity<BoardDetailResponse> updateBoard(@RequestBody BoardDetailRequest request, @RequestParam String userId) throws AccessDeniedException {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
         return ResponseEntity.ok(boardService.updateBoard(boardDetail, userId));
     }
 
     //게시글 삭제
-    @DeleteMapping("/before/board/{boardId}/{userId}")
-    public ResponseEntity<Void> deletBoard(@RequestBody BoardDetailRequest request, @PathVariable String userId) throws AccessDeniedException {
+    @DeleteMapping("/before/board/{boardId}")
+    public ResponseEntity<Void> deletBoard(@RequestBody BoardDetailRequest request, @RequestParam String userId) throws AccessDeniedException {
         BoardDetailServiceRequest boardDetail = request.toBoardDetailServiceRequest();
         boardService.deleteBoard(boardDetail, userId);
         return ResponseEntity.noContent().build();
