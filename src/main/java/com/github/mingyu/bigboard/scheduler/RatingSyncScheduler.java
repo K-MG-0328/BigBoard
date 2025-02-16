@@ -1,6 +1,7 @@
 package com.github.mingyu.bigboard.scheduler;
 
 import com.github.mingyu.bigboard.service.RedisRatingDataService;
+import com.github.mingyu.bigboard.service.RedisRatingSyncService;
 import com.github.mingyu.bigboard.util.RedisKeyHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.util.Set;
 public class RatingSyncScheduler {
 
     private final RedisRatingDataService redisRatingDataService;
+    private final RedisRatingSyncService redisRatingSyncService;
 
    // @Scheduled(fixedRate = 60000) // 60초마다 동기화
     public void syncRatingData() {
@@ -27,7 +29,7 @@ public class RatingSyncScheduler {
                 double totalScore = redisRatingDataService.getTotalScore(key);
                 int ratingCount = redisRatingDataService.getRatingCount(key);
 
-                redisRatingDataService.syncRatingData(boardId, totalScore, ratingCount);
+                redisRatingSyncService.syncRatingData(boardId, totalScore, ratingCount);
             });
         }
     }
